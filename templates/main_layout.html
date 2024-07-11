@@ -1,16 +1,31 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
   <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
     {% if title %}
       <title>{{ title }}</title>
     {% else %}
       <title>Web Finance</title>
     {% endif %}
-    <link rel="stylesheet" href={{url_for('static', filename = 'main_css.css')}}>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename = 'main_css.css') }}">
+    {% block head %}
+    {% endblock %}
   </head>
   <body>
-  
+    <div class="header_tab">
+      <img class="logo" src="{{ url_for('static', filename='assets/logo.png') }}" onclick="goToHomePage()" style="cursor: pointer;"/>
+      <ul class="nav">
+        <li><a href="/client">Client</a></li>
+        <li><a href="/facture">Facture</a></li>
+        <li><a href="/stock">Stock</a></li>
+        <li><a href="/detail">Detaille</a></li>
+        <li><a href="/time">Temp</a></li>
+        <li><a href="/work">Employes</a></li>
+        <li><a href="/game">Gamme</a></li>
+        <li><a href="/cost">Frai</a></li>
+        <li><a href="/mail">Mail</a></li>
+        <li><a href="/">Logout</a></li>
+      </ul>
+    </div>
+    <div class="main_content"></div>
   </body>
 </html>
