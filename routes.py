@@ -1,0 +1,7 @@
+from flask import render_template, jsonify, request
+from main import app
+
+
+@app.route("/")
+def index():
+    return render_template('main_layout.html')
