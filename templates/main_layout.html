@@ -7,18 +7,32 @@
       <title>Web Finance</title>
     {% endif %}
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename = 'CSS/main_css.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename = 'CSS/buttons.css') }}">
     {% block head %}
+
     {% endblock %}
+
   </head>
   <body>
     <div class="header_tab">
       <img class="logo" src="{{ url_for('static', filename='assets/th.png') }}" onclick="goToHomePage()" style="cursor: pointer;"/>
       <ul class="nav">
+        <li><a href="/">Main</a></li>
+        <li><a href="/expenses"">Expenses</a></li>
+        <li><a href="/income"">Income</a></li>
+        <li><a href="/types">Types</a></li>
         <li><a href="/close">Logout</a></li>
       </ul>
     </div>
-    <div class="main_content"></div>
+    <div class="main_content">
+
+      {% block content %}
+
+      {% endblock %}
+
+    </div>
   </body>
+  <script src="{{ url_for('static', filename = 'JS/plotly-latest.min.js') }}"></script>
   <script>
     function goToHomePage() {
       window.location.href = '/';

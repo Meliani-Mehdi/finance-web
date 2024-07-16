@@ -1,0 +1,14 @@
+{% extends 'main_layout.html' %}
+
+{% block head %}
+  <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename = 'CSS/form.css') }}">
+{% endblock %}
+
+{% block content %}
+  <br><br><br>
+  <a href="/types/list"><button class="fade_btn">List of Types</button></a>
+  <br><br>
+  <a href="/types/add"><button class="fade_btn">Add Type</button></a>
+{% endblock %}
+
+

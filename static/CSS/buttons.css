@@ -1,0 +1,126 @@
+/* Button 1 */
+.apply_btn {
+  position: relative;
+  transition: all 0.3s ease-in-out;
+  box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.2);
+  padding-block: 0.5rem;
+  padding-inline: 1.25rem;
+  background-color: rgb(0 107 179);
+  border-radius: 9999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: #fff;
+  gap: 10px;
+  font-weight: bold;
+  border: 3px solid #ffffff4d;
+  outline: none;
+  overflow: hidden;
+  font-size: 15px;
+}
+
+.apply_btn .icon {
+  width: 24px;
+  height: 24px;
+  transition: all 0.3s ease-in-out;
+}
+
+.apply_btn:hover {
+  transform: scale(1.05);
+  border-color: #fff9;
+}
+
+.apply_btn:hover .icon {
+  transform: translate(4px);
+}
+
+.apply_btn::before {
+  content: "";
+  position: absolute;
+  width: 100px;
+  height: 100%;
+  background-image: linear-gradient(
+    120deg,
+    rgba(255, 255, 255, 0) 30%,
+    rgba(255, 255, 255, 0.8),
+    rgba(255, 255, 255, 0) 70%
+  );
+  top: 0;
+  left: -100px;
+  opacity: 0.6;
+}
+
+@keyframes shine {
+  0% {
+    left: -100px;
+  }
+  60% {
+    left: 100%;
+  }
+  to {
+    left: 100%;
+  }
+}
+
+/* Button 2 */
+.shake_btn {
+  height: 3em;
+  width: 8em;
+  border: none;
+  border-radius: 10em;
+  background: #016DD9;
+  font-size: 17px;
+  color: #fff;
+  font-family: inherit;
+  font-weight: 500;
+}
+
+.shake_btn:hover {
+  animation: shake3856 0.3s linear infinite both;
+}
+
+@keyframes shake3856 {
+  0% {
+    transform: translate(0);
+  }
+  20% {
+    transform: translate(-2px, 2px);
+  }
+  40% {
+    transform: translate(-2px, -2px);
+  }
+  60% {
+    transform: translate(2px, 2px);
+  }
+  80% {
+    transform: translate(2px, -2px);
+  }
+  100% {
+    transform: translate(0);
+  }
+}
+
+/* Button 3 */
+.fade_btn {
+  padding: 1rem 2rem;
+  font-weight: 700;
+  background: #FFFFFF;
+  color: #87D434;
+  cursor: pointer;
+  border-radius: 0.5rem;
+  border-bottom: 2px solid #1C140D;
+  border-right: 2px solid #1C140D;
+  border-top: 2px solid #F2E9E1;
+  border-left: 2px solid #F2E9E1;
+  transition-duration: 1s;
+  transition-property: border-top, border-left, border-bottom, border-right, box-shadow;
+}
+
+.fade_btn:hover {
+  border-top: 2px solid #1C140D;
+  border-left: 2px solid #1C140D;
+  border-bottom: 2px solid #2A221B;
+  border-right: 2px solid #2A221B;
+  box-shadow: #2A221B80 5px 5px, #2A221B65 10px 10px, #2A221B40 15px 15px;
+}

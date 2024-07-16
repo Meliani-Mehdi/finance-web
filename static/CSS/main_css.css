@@ -51,12 +51,17 @@ body {
 }
 
 .main_content {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    text-align: center;
     background-color: #CBE86B;
     padding: 5vh 5vw;
     min-height: 100vh;
     margin-top: calc(2vh + 8vh);
     box-sizing: border-box;
     overflow-x: hidden;
+    white-space: pre-line; /* Ensures that whitespace and line breaks are preserved */
 }
 
 @media (max-width: 1200px) {
