@@ -38,8 +38,10 @@ def init_db():
             name TEXT UNIQUE NOT NULL 
         )
     ''')
+    
+    conn.close()
 
-
+init_db()
 
 
 if __name__ == '__main__':
