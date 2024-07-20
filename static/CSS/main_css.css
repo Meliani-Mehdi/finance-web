@@ -108,3 +108,33 @@ body {
         padding: 3vh 3vw;
     }
 }
+
+::-webkit-scrollbar {
+    width: 8px; 
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #888; 
+    border-radius: 10px;
+    border: 2px solid #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}
+
+/* For Firefox */
+* {
+    scrollbar-width: thin;  /* Makes the scrollbar thinner */
+    scrollbar-color: #888 #f1f1f1;  /* thumb color and track color */
+}
+
+/* For Internet Explorer and Edge */
+body {
+    -ms-overflow-style: -ms-autohiding-scrollbar;  /* Hide the scrollbar when not scrolling */
+}
