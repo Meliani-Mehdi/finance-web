@@ -20,11 +20,11 @@ th {
 }
 
 tr:nth-child(even) td {
-  background: linear-gradient(to right, #649636, #7BB944);
+  background: linear-gradient(to right, #77B13F, #79B53C);
 }
 
 tr:nth-child(odd) td {
-  background: linear-gradient(to right, #6CA03C, #7DC34A);
+  background: linear-gradient(to right, #7DC34A, #7BB944);
 }
 
 tr:hover td {

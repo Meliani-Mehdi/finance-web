@@ -14,13 +14,21 @@ def types():
 @app.route("/types/add", methods=["POST", "GET"])
 def addtypes():
     if request.method == "POST":
-        conn = sqlite3.connect('finance.db')
-        cursor = conn.cursor()
         name = request.form.get("name")
-        cursor.execute("INSERT INTO type(name) values(?)", (name, ))
-        conn.commit()
-        conn.close()
+        if not name:
+            return render_template('err.html', message="Name is required")
+        try:
+            with sqlite3.connect('finance.db') as conn:
+                cursor = conn.cursor()
+                cursor.execute("INSERT INTO type (name) VALUES (?)", (name,))
+                conn.commit()
+        except sqlite3.IntegrityError:
+            return render_template('err.html', message="Type already exists")
+        except Exception as e:
+            return render_template('err.html', message=str(e))
+
         return redirect('/types')
+    
     return render_template('add_types.html')
 
 @app.route("/types/list")
