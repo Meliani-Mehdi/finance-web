@@ -4,7 +4,11 @@
   <br><br><br>
   <h1>{{ message }}</h1>
   <br>
-  <a href="/types"><button class="fade_btn">Go Back</button></a>
+  {% if link %}
+  <a href="{{ link }}"><button class="fade_btn">Go Back</button></a>
+  {% else %}
+  <a href="/"><button class="fade_btn">Go Back</button></a>
+  {% endif %}
 {% endblock %}
 
 

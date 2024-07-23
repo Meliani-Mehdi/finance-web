@@ -7,7 +7,7 @@
       <th>Name</th>
     </tr>
     {% for data in types %}
-      <tr>
+      <tr onclick="window.location.href='/types/list/{{ data[0] }}'">
         <td>{{ data[1] }}</td>
       </tr>
     {% endfor %}

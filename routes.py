@@ -39,3 +39,27 @@ def listtypes():
     types = cursor.fetchall()
 
     return render_template('list_types.html', types = types)
+
+@app.route("/types/list/<int:id>", methods=["POST", "GET"])
+def edittype(id):
+    if request.method == "POST":
+        name = request.form.get("name")
+        if not name:
+            return render_template('err.html', message="Name is required")
+        try:
+            with sqlite3.connect('finance.db') as conn:
+                cursor = conn.cursor()
+                cursor.execute("INSERT INTO type (name) VALUES (?)", (name,))
+                conn.commit()
+        except sqlite3.IntegrityError:
+            return render_template('err.html', message="Type already exists")
+        except Exception as e:
+            return render_template('err.html', message=str(e))
+
+        return redirect('/types')
+    
+    conn = sqlite3.connect('finance.db')
+    cursor = conn.cursor()
+    cursor.execute("SELECT name FROM type WHERE id = ?", (id, ))
+    name_val = cursor.fetchone()[0]
+    return render_template('edit_types.html', val=name_val)
