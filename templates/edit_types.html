@@ -2,29 +2,40 @@
 
 {% block head %}
   <style>
-    button{
+    button {
       display: inline-block !important;
       width: calc(50% - 2px) !important;
     }
-      .button-container {
-          display: flex;
-          gap: 10px; 
-      }
+    .button-container {
+      display: flex;
+      gap: 10px;
+    }
   </style>
-  <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename = 'CSS/form.css') }}">
+  <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='CSS/form.css') }}">
 {% endblock %}
 
 {% block content %}
   <br><br><br>
 
-  <form action="/types/add" method="post">
+  <form id="dynamicForm" method="post">
     <label for="name">Name:</label>
-    <input type="text" name="name" value="{{ val }}" required> 
+    <input type="text" name="name" value="{{ val }}" required>
     <div class="button-container">
-      <button class="shake_btn">Delete</button>
-      <button class="apply_btn">Edit</button>
+      <button type="button" class="shake_btn" onclick="submitForm('delete')">Delete</button>
+      <button type="button" class="apply_btn" onclick="submitForm('edit')">Edit</button>
     </div>
   </form>
+
+  <script>
+    function submitForm(actionType) {
+      var form = document.getElementById('dynamicForm');
+      var id = "{{ id }}";
+      if (actionType === 'delete') {
+        form.action = `/types/delete/${id}`;
+      } else if (actionType === 'edit') {
+        form.action = `/types/edit/${id}`;
+      }
+      form.submit();
+    }
+  </script>
 {% endblock %}
-
-

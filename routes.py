@@ -40,8 +40,8 @@ def listtypes():
 
     return render_template('list_types.html', types = types)
 
-@app.route("/types/list/<int:id>", methods=["POST", "GET"])
-def edittype(id):
+@app.route("/types/list/<int:id>")
+def seetype(id):
     if request.method == "POST":
         name = request.form.get("name")
         if not name:
@@ -62,4 +62,21 @@ def edittype(id):
     cursor = conn.cursor()
     cursor.execute("SELECT name FROM type WHERE id = ?", (id, ))
     name_val = cursor.fetchone()[0]
-    return render_template('edit_types.html', val=name_val)
+    return render_template('edit_types.html', val=name_val, id=id)
+
+@app.route("/types/edit/<int:id>", methods=['POST'])
+def edittype(id):
+    if request.method == "POST":
+        name = request.form.get("name")
+        if not name:
+            return render_template('err.html', message="Name is required")
+        try:
+            with sqlite3.connect('finance.db') as conn:
+                cursor = conn.cursor()
+                cursor.execute("UPDATE type SET name = ? WHERE id = ?", (name,id))
+                conn.commit()
+        except sqlite3.IntegrityError:
+            return render_template('err.html', message="Type already exists")
+        except Exception as e:
+            return render_template('err.html', message=str(e))
+    return redirect("/types/list")
