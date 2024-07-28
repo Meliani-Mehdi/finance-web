@@ -80,3 +80,20 @@ def edittype(id):
         except Exception as e:
             return render_template('err.html', message=str(e))
     return redirect("/types/list")
+
+@app.route("/types/delete/<int:id>", methods=['POST'])
+def deletetype(id):
+    if request.method == "POST":
+        name = request.form.get("name")
+        if not name:
+            return render_template('err.html', message="Name is required")
+        try:
+            with sqlite3.connect('finance.db') as conn:
+                cursor = conn.cursor()
+                cursor.execute("DELETE FROM type WHERE id = ?", (id, ))
+                conn.commit()
+        except sqlite3.IntegrityError:
+            return render_template('err.html', message="Type already exists")
+        except Exception as e:
+            return render_template('err.html', message=str(e))
+    return redirect("/types/list")

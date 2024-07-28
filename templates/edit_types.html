@@ -10,6 +10,52 @@
       display: flex;
       gap: 10px;
     }
+
+    .modal {
+      display: none; 
+      position: fixed; 
+      z-index: 1; 
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      overflow: auto; 
+      background-color: rgba(0,0,0,0.5); 
+      padding-top: 60px;
+    }
+    .modal-content {
+      background-color: #fefefe;
+      margin: 5% auto;
+      padding: 20px;
+      border: 1px solid #888;
+      border-radius: 15px;
+      width: 80%; 
+      max-width: 400px;
+      text-align: center;
+    }
+    .modal-header {
+      font-size: 20px;
+      margin-bottom: 10px;
+    }
+    .modal-buttons {
+      display: flex;
+      justify-content: space-around;
+      margin-top: 20px;
+    }
+    .modal-button {
+      padding: 10px 20px;
+      cursor: pointer;
+      border: none;
+      border-radius: 15px;
+    }
+    .confirm-btn {
+      background-color: #4CAF50;
+      color: white;
+    }
+    .cancel-btn {
+      background-color: #f44336;
+      color: white;
+    }
   </style>
   <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='CSS/form.css') }}">
 {% endblock %}
@@ -21,13 +67,35 @@
     <label for="name">Name:</label>
     <input type="text" name="name" value="{{ val }}" required>
     <div class="button-container">
-      <button type="button" class="shake_btn" onclick="submitForm('delete')">Delete</button>
-      <button type="button" class="apply_btn" onclick="submitForm('edit')">Edit</button>
+      <button type="button" class="shake_btn" onclick="showModal('delete')">Delete</button>
+      <button type="button" class="apply_btn" onclick="showModal('edit')">Edit</button>
     </div>
   </form>
 
+  <div id="confirmationModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">Confirm Action</div>
+      <div>Are you sure you want to proceed?</div>
+      <div class="modal-buttons">
+        <button id="confirmButton" class="modal-button confirm-btn">Confirm</button>
+        <button type="button" class="modal-button cancel-btn" onclick="hideModal()">Cancel</button>
+      </div>
+    </div>
+  </div>
+
   <script>
-    function submitForm(actionType) {
+    let actionType = '';
+
+    function showModal(action) {
+      actionType = action;
+      document.getElementById('confirmationModal').style.display = 'block';
+    }
+
+    function hideModal() {
+      document.getElementById('confirmationModal').style.display = 'none';
+    }
+
+    document.getElementById('confirmButton').addEventListener('click', function() {
       var form = document.getElementById('dynamicForm');
       var id = "{{ id }}";
       if (actionType === 'delete') {
@@ -36,6 +104,6 @@
         form.action = `/types/edit/${id}`;
       }
       form.submit();
-    }
+    });
   </script>
 {% endblock %}
