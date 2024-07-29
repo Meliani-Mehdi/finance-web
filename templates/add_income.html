@@ -1,0 +1,29 @@
+{% extends 'main_layout.html' %}
+
+{% block head %}
+  <style>
+    button{
+      width: calc(100%);
+    }
+  </style>
+  <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename = 'CSS/form.css') }}">
+{% endblock %}
+
+{% block content %}
+  <br>
+  <form action="/income/add" method="post">
+    <label for="type">Type:</label>
+    <select name="type" required>
+      {% for data in types %}
+        <option value="{{ data[0] }}">{{ data[1] }}</option>
+      {% endfor %}
+    </select>
+    <label for="amount">Amount:</label>
+    <input type="text" name="Amount" pattern="^(?!0(\.0+)?$)\d+(\.\d+)?$" required title="Please enter a positive number greater than zero"> 
+    <label for="comment">Comment:</label>
+    <textarea id="comment" name="comments" rows="10" cols="50"></textarea>
+    <button class="apply_btn">Add</button>
+  </form>
+{% endblock %}
+
+

@@ -1,6 +1,8 @@
 from flask import redirect, render_template, request
 from main import app
 import sqlite3
+import xlsxwriter
+import plotly
 
 
 @app.route("/")
@@ -97,3 +99,17 @@ def deletetype(id):
         except Exception as e:
             return render_template('err.html', message=str(e))
     return redirect("/types/list")
+
+@app.route("/income")
+def income():
+    return render_template("income.html")
+
+@app.route("/income/add", methods=["POST", "GET"])
+def addincome():
+    if request.method == "POST":
+        pass
+    return render_template("add_income.html")
+
+@app.route("/expenses")
+def expense():
+    return render_template("expense.html")

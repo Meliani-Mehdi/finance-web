@@ -1,7 +1,5 @@
 from flask import Flask
 import sqlite3
-import xlsxwriter
-import plotly
 import webview
 app = Flask(__name__)
 from routes import *
