@@ -1,0 +1,24 @@
+{% extends 'main_layout.html' %}
+
+{% block head %}
+  <style>
+    button{
+      width: 250px;
+    }
+  </style>
+{% endblock %}
+
+{% block content %}
+  <br><br><br>
+  <a href="/income/sheet/day"><button class="fade_btn">This Day</button></a>
+  <br><br>
+  <a href="/income/sheet/week"><button class="fade_btn">This Week</button></a>
+  <br><br>
+  <a href="/income/sheet/month"><button class="fade_btn">This Month</button></a>
+  <br><br>
+  <a href="/income/sheet/year"><button class="fade_btn">This Year</button></a>
+  <br><br>
+  <a href="/income/sheet/all"><button class="fade_btn">All Time</button></a>
+{% endblock %}
+
+
