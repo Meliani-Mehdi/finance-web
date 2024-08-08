@@ -15,32 +15,48 @@ form h2 {
 }
 
 form label {
-    display: block;
     color: #1C140D;
+    font-weight: bold;
+    margin-bottom: 8px;
 }
 
 form input[type="text"],
-form input[type="email"],
-form textarea {
+form textarea,
+form select {
     width: calc(100% - 20px);
     padding: 10px;
     margin-bottom: 15px;
     border: 1px solid #CCCCCC;
     border-radius: 4px;
     font-size: 14px;
+    box-sizing: border-box;
+    color: #333;
+    background-color: #F9F9F9;
+    transition: border-color 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
 }
 
-form input[type="submit"] {
-    width: 100%;
-    padding: 10px;
-    background-color: #1C140D;
-    color: #FFFFFF;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 16px;
+form textarea {
+    resize: vertical;
 }
 
-form input[type="submit"]:hover {
-    background-color: #CBE86B;
+form input[type="text"]:hover,
+form textarea:hover,
+form select:hover,
+form input[type="text"]:focus,
+form textarea:focus,
+form select:focus {
+    border-color: #333333;
+    box-shadow: 0 0 5px rgba(203, 232, 107, 0.5);
+    outline: none;
+}
+
+form select {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background-color: #FFFFFF;
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 4 5"><path fill="%231C140D" d="M2 0L0 2h4z"/></svg>');
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    background-size: 10px 10px;
 }
