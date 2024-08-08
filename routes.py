@@ -202,118 +202,119 @@ def addincome():
     return render_template("add_income.html", types=data)
 
 
-@app.route("/income/sheet/<time>")
+@app.route("/income/sheet/<time>", methods=["POST", "GET"])
 def income_sheet_time(time):
     data = fetch_data("income", time)
+    if request.method == "POST":
+        file_name = f"income_sheet_{time}.xlsx"
+        file_path = os.path.join("sheets", file_name)
 
-    file_name = f"income_sheet_{time}.xlsx"
-    file_path = os.path.join("sheets", file_name)
+        if not os.path.exists("sheets"):
+            os.makedirs("sheets")
 
-    if not os.path.exists("sheets"):
-        os.makedirs("sheets")
+        workbook = xlsxwriter.Workbook(file_path)
+        worksheet = workbook.add_worksheet("Income Sheet")
 
-    workbook = xlsxwriter.Workbook(file_path)
-    worksheet = workbook.add_worksheet("Income Sheet")
+        header_format = workbook.add_format(
+            {
+                "bold": True,
+                "bg_color": "#4F81BD",
+                "font_color": "#FFFFFF",
+                "border": 1,
+                "align": "center",
+                "valign": "vcenter",
+            }
+        )
+        currency_format = workbook.add_format(
+            {
+                "num_format": "#,##0.00",
+                "border": 1,
+                "align": "right",
+            }
+        )
+        date_format = workbook.add_format(
+            {
+                "num_format": "yyyy-mm-dd",
+                "border": 1,
+                "align": "center",
+            }
+        )
+        total_format = workbook.add_format(
+            {
+                "bold": True,
+                "bg_color": "#FFC000",
+                "border": 1,
+                "align": "right",
+            }
+        )
+        highlight_format = workbook.add_format(
+            {
+                "bg_color": "#C6EFCE",
+                "font_color": "#006100",
+            }
+        )
+        summary_format = workbook.add_format(
+            {
+                "bold": True,
+                "bg_color": "#DCE6F1",
+                "border": 1,
+                "align": "right",
+            }
+        )
 
-    header_format = workbook.add_format(
-        {
-            "bold": True,
-            "bg_color": "#4F81BD",
-            "font_color": "#FFFFFF",
-            "border": 1,
-            "align": "center",
-            "valign": "vcenter",
-        }
-    )
-    currency_format = workbook.add_format(
-        {
-            "num_format": "#,##0.00",
-            "border": 1,
-            "align": "right",
-        }
-    )
-    date_format = workbook.add_format(
-        {
-            "num_format": "yyyy-mm-dd",
-            "border": 1,
-            "align": "center",
-        }
-    )
-    total_format = workbook.add_format(
-        {
-            "bold": True,
-            "bg_color": "#FFC000",
-            "border": 1,
-            "align": "right",
-        }
-    )
-    highlight_format = workbook.add_format(
-        {
-            "bg_color": "#C6EFCE",
-            "font_color": "#006100",
-        }
-    )
-    summary_format = workbook.add_format(
-        {
-            "bold": True,
-            "bg_color": "#DCE6F1",
-            "border": 1,
-            "align": "right",
-        }
-    )
+        headers = ["ID", "Date", "Type", "Amount", "Info"]
+        for col_num, header in enumerate(headers):
+            worksheet.write(0, col_num, header, header_format)
 
-    headers = ["ID", "Date", "Type", "Amount", "Info"]
-    for col_num, header in enumerate(headers):
-        worksheet.write(0, col_num, header, header_format)
+        for row_num, row_data in enumerate(data, start=1):
+            worksheet.write(row_num, 0, row_data[0])  # ID
+            worksheet.write(row_num, 1, row_data[1], date_format)  # Date
+            worksheet.write(row_num, 2, row_data[2])  # Type
+            worksheet.write(row_num, 3, row_data[3], currency_format)  # Amount
+            worksheet.write(row_num, 4, row_data[4])  # Info
 
-    for row_num, row_data in enumerate(data, start=1):
-        worksheet.write(row_num, 0, row_data[0])  # ID
-        worksheet.write(row_num, 1, row_data[1], date_format)  # Date
-        worksheet.write(row_num, 2, row_data[2])  # Type
-        worksheet.write(row_num, 3, row_data[3], currency_format)  # Amount
-        worksheet.write(row_num, 4, row_data[4])  # Info
+        worksheet.conditional_format(
+            f"D2:D{len(data)+1}",
+            {
+                "type": "cell",
+                "criteria": ">",
+                "value": 1000,
+                "format": highlight_format,
+            },
+        )
 
-    worksheet.conditional_format(
-        f"D2:D{len(data)+1}",
-        {
-            "type": "cell",
-            "criteria": ">",
-            "value": 1000,
-            "format": highlight_format,
-        },
-    )
+        total_row = len(data) + 1
+        worksheet.write(total_row, 2, "Total", total_format)
+        worksheet.write_formula(total_row, 3, f"=SUM(D2:D{total_row})", total_format)
 
-    total_row = len(data) + 1
-    worksheet.write(total_row, 2, "Total", total_format)
-    worksheet.write_formula(total_row, 3, f"=SUM(D2:D{total_row})", total_format)
+        summary_row = total_row + 2
+        worksheet.write(summary_row, 2, "Average", summary_format)
+        worksheet.write_formula(
+            summary_row, 3, f"=AVERAGE(D2:D{total_row})", summary_format
+        )
+        worksheet.write(summary_row + 1, 2, "Max", summary_format)
+        worksheet.write_formula(
+            summary_row + 1, 3, f"=MAX(D2:D{total_row})", summary_format
+        )
+        worksheet.write(summary_row + 2, 2, "Min", summary_format)
+        worksheet.write_formula(
+            summary_row + 2, 3, f"=MIN(D2:D{total_row})", summary_format
+        )
 
-    summary_row = total_row + 2
-    worksheet.write(summary_row, 2, "Average", summary_format)
-    worksheet.write_formula(
-        summary_row, 3, f"=AVERAGE(D2:D{total_row})", summary_format
-    )
-    worksheet.write(summary_row + 1, 2, "Max", summary_format)
-    worksheet.write_formula(
-        summary_row + 1, 3, f"=MAX(D2:D{total_row})", summary_format
-    )
-    worksheet.write(summary_row + 2, 2, "Min", summary_format)
-    worksheet.write_formula(
-        summary_row + 2, 3, f"=MIN(D2:D{total_row})", summary_format
-    )
+        worksheet.set_column(0, 0, 5)
+        worksheet.set_column(1, 1, 15)
+        worksheet.set_column(2, 2, 20)
+        worksheet.set_column(3, 3, 15)
+        worksheet.set_column(4, 4, 40)
 
-    worksheet.set_column(0, 0, 5)
-    worksheet.set_column(1, 1, 15)
-    worksheet.set_column(2, 2, 20)
-    worksheet.set_column(3, 3, 15)
-    worksheet.set_column(4, 4, 40)
+        worksheet.freeze_panes(1, 0)
 
-    worksheet.freeze_panes(1, 0)
+        worksheet.autofilter(0, 0, total_row - 1, len(headers) - 1)
 
-    worksheet.autofilter(0, 0, total_row - 1, len(headers) - 1)
+        workbook.close()
 
-    workbook.close()
-
-    return render_template("err.html", message="Done")
+        return render_template("err.html", message="Done")
+    return render_template("income_sheet.html", datas=data)
 
 
 # expense
@@ -329,124 +330,125 @@ def expense_sheet():
     return render_template("expense_t.html")
 
 
-@app.route("/expenses/sheet/<time>")
+@app.route("/expenses/sheet/<time>", methods=["POST", "GET"])
 def expense_sheet_time(time):
     data = fetch_data("expenses", time)
+    if request.method == "POST":
+        file_name = f"expense_sheet_{time}.xlsx"
+        file_path = os.path.join("sheets", file_name)
 
-    file_name = f"expense_sheet_{time}.xlsx"
-    file_path = os.path.join("sheets", file_name)
+        if not os.path.exists("sheets"):
+            os.makedirs("sheets")
 
-    if not os.path.exists("sheets"):
-        os.makedirs("sheets")
+        workbook = xlsxwriter.Workbook(file_path)
+        worksheet = workbook.add_worksheet("Expense Sheet")
 
-    workbook = xlsxwriter.Workbook(file_path)
-    worksheet = workbook.add_worksheet("Expense Sheet")
+        # Define formats
+        header_format = workbook.add_format(
+            {
+                "bold": True,
+                "bg_color": "#4F81BD",
+                "font_color": "#FFFFFF",
+                "border": 1,
+                "align": "center",
+                "valign": "vcenter",
+            }
+        )
+        currency_format = workbook.add_format(
+            {
+                "num_format": "#,##0.00",
+                "border": 1,
+                "align": "right",
+            }
+        )
+        date_format = workbook.add_format(
+            {
+                "num_format": "yyyy-mm-dd",
+                "border": 1,
+                "align": "center",
+            }
+        )
+        total_format = workbook.add_format(
+            {
+                "bold": True,
+                "bg_color": "#FFC000",
+                "border": 1,
+                "align": "right",
+            }
+        )
+        highlight_format = workbook.add_format(
+            {
+                "bg_color": "#FFC7CE",
+                "font_color": "#9C0006",
+            }
+        )
+        summary_format = workbook.add_format(
+            {
+                "bold": True,
+                "bg_color": "#DCE6F1",
+                "border": 1,
+                "align": "right",
+            }
+        )
 
-    # Define formats
-    header_format = workbook.add_format(
-        {
-            "bold": True,
-            "bg_color": "#4F81BD",
-            "font_color": "#FFFFFF",
-            "border": 1,
-            "align": "center",
-            "valign": "vcenter",
-        }
-    )
-    currency_format = workbook.add_format(
-        {
-            "num_format": "#,##0.00",
-            "border": 1,
-            "align": "right",
-        }
-    )
-    date_format = workbook.add_format(
-        {
-            "num_format": "yyyy-mm-dd",
-            "border": 1,
-            "align": "center",
-        }
-    )
-    total_format = workbook.add_format(
-        {
-            "bold": True,
-            "bg_color": "#FFC000",
-            "border": 1,
-            "align": "right",
-        }
-    )
-    highlight_format = workbook.add_format(
-        {
-            "bg_color": "#FFC7CE",
-            "font_color": "#9C0006",
-        }
-    )
-    summary_format = workbook.add_format(
-        {
-            "bold": True,
-            "bg_color": "#DCE6F1",
-            "border": 1,
-            "align": "right",
-        }
-    )
+        # Write headers
+        headers = ["ID", "Date", "Type", "Amount", "Info"]
+        for col_num, header in enumerate(headers):
+            worksheet.write(0, col_num, header, header_format)
 
-    # Write headers
-    headers = ["ID", "Date", "Type", "Amount", "Info"]
-    for col_num, header in enumerate(headers):
-        worksheet.write(0, col_num, header, header_format)
+        # Write data rows
+        for row_num, row_data in enumerate(data, start=1):
+            worksheet.write(row_num, 0, row_data[0])  # ID
+            worksheet.write(row_num, 1, row_data[1], date_format)  # Date
+            worksheet.write(row_num, 2, row_data[2])  # Type
+            worksheet.write(row_num, 3, row_data[3], currency_format)  # Amount
+            worksheet.write(row_num, 4, row_data[4])  # Info
 
-    # Write data rows
-    for row_num, row_data in enumerate(data, start=1):
-        worksheet.write(row_num, 0, row_data[0])  # ID
-        worksheet.write(row_num, 1, row_data[1], date_format)  # Date
-        worksheet.write(row_num, 2, row_data[2])  # Type
-        worksheet.write(row_num, 3, row_data[3], currency_format)  # Amount
-        worksheet.write(row_num, 4, row_data[4])  # Info
+        # Apply conditional formatting for Amount > $1000
+        worksheet.conditional_format(
+            f"D2:D{len(data)+1}",
+            {
+                "type": "cell",
+                "criteria": ">",
+                "value": 1000,
+                "format": highlight_format,
+            },
+        )
 
-    # Apply conditional formatting for Amount > $1000
-    worksheet.conditional_format(
-        f"D2:D{len(data)+1}",
-        {
-            "type": "cell",
-            "criteria": ">",
-            "value": 1000,
-            "format": highlight_format,
-        },
-    )
+        # Calculate and write totals
+        total_row = len(data) + 1
+        worksheet.write(total_row, 2, "Total", total_format)
+        worksheet.write_formula(total_row, 3, f"=SUM(D2:D{total_row})", total_format)
 
-    # Calculate and write totals
-    total_row = len(data) + 1
-    worksheet.write(total_row, 2, "Total", total_format)
-    worksheet.write_formula(total_row, 3, f"=SUM(D2:D{total_row})", total_format)
+        # Summary section
+        summary_row = total_row + 2
+        worksheet.write(summary_row, 2, "Average", summary_format)
+        worksheet.write_formula(
+            summary_row, 3, f"=AVERAGE(D2:D{total_row})", summary_format
+        )
+        worksheet.write(summary_row + 1, 2, "Max", summary_format)
+        worksheet.write_formula(
+            summary_row + 1, 3, f"=MAX(D2:D{total_row})", summary_format
+        )
+        worksheet.write(summary_row + 2, 2, "Min", summary_format)
+        worksheet.write_formula(
+            summary_row + 2, 3, f"=MIN(D2:D{total_row})", summary_format
+        )
 
-    # Summary section
-    summary_row = total_row + 2
-    worksheet.write(summary_row, 2, "Average", summary_format)
-    worksheet.write_formula(
-        summary_row, 3, f"=AVERAGE(D2:D{total_row})", summary_format
-    )
-    worksheet.write(summary_row + 1, 2, "Max", summary_format)
-    worksheet.write_formula(
-        summary_row + 1, 3, f"=MAX(D2:D{total_row})", summary_format
-    )
-    worksheet.write(summary_row + 2, 2, "Min", summary_format)
-    worksheet.write_formula(
-        summary_row + 2, 3, f"=MIN(D2:D{total_row})", summary_format
-    )
+        worksheet.set_column(0, 0, 5)
+        worksheet.set_column(1, 1, 15)
+        worksheet.set_column(2, 2, 20)
+        worksheet.set_column(3, 3, 15)
+        worksheet.set_column(4, 4, 40)
 
-    worksheet.set_column(0, 0, 5)
-    worksheet.set_column(1, 1, 15)
-    worksheet.set_column(2, 2, 20)
-    worksheet.set_column(3, 3, 15)
-    worksheet.set_column(4, 4, 40)
+        worksheet.freeze_panes(1, 0)
 
-    worksheet.freeze_panes(1, 0)
+        worksheet.autofilter(0, 0, total_row - 1, len(headers) - 1)
 
-    worksheet.autofilter(0, 0, total_row - 1, len(headers) - 1)
+        workbook.close()
 
-    workbook.close()
-
-    return render_template("err.html", message="Done")
+        return render_template("err.html", message="Done")
+    return render_template("expense_sheet.html", datas=data)
 
 
 @app.route("/expenses/add", methods=["POST", "GET"])

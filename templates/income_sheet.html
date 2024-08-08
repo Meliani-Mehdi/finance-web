@@ -1,0 +1,37 @@
+{% extends 'main_layout.html' %}
+
+{% block head %}
+  <style>
+    table{
+      width: calc(100% / 3 * 2);
+    } 
+  </style>
+{% endblock %}
+
+{% block content %}
+  <br><br><br>
+  <table>
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Date</th>
+        <th>Type</th>
+        <th>Amount</th>
+        <th>info</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for data in datas %}
+        <tr>
+          <td>{{ data[0] }}</td>
+          <td>{{ data[1] }}</td>
+          <td>{{ data[2] }}</td>
+          <td>{{ data[3] }}</td>
+          <td>{{ data[4] }}</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+{% endblock %}
+
+

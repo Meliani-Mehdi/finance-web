@@ -3,7 +3,6 @@ import sqlite3
 import webview
 from screeninfo import get_monitors
 import keyboard
-import platform
 
 app = Flask(__name__)
 from routes import *
