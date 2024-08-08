@@ -1,10 +1,10 @@
-from flask import redirect, render_template, request
+from flask import redirect, render_template, request, send_file
+from datetime import datetime, timedelta
 from main import app
 import os
 import sqlite3
 import xlsxwriter
 import plotly
-import datetime
 
 
 def fetch_data(table_name, time_period):
@@ -15,14 +15,12 @@ def fetch_data(table_name, time_period):
         query = f"SELECT * FROM {table_name}"
         params = ()
     else:
-        now = datetime.datetime.now()
+        now = datetime.now()
         if time_period == "day":
             start_date = now.strftime("%Y-%m-%d")
             end_date = start_date
         elif time_period == "week":
-            start_date = (now - datetime.timedelta(days=now.weekday())).strftime(
-                "%Y-%m-%d"
-            )
+            start_date = (now - timedelta(days=now.weekday())).strftime("%Y-%m-%d")
             end_date = now.strftime("%Y-%m-%d")
         elif time_period == "month":
             start_date = now.replace(day=1).strftime("%Y-%m-%d")
@@ -164,13 +162,83 @@ def income_sheet():
 @app.route("/income/add", methods=["POST", "GET"])
 def addincome():
     if request.method == "POST":
-        pass
-    return render_template("add_income.html")
+        date = datetime.now().strftime("%Y-%m-%d")
+        t_type = request.form.get("type")
+        amount = request.form.get("amount")
+        info = request.form.get("comment")
+        try:
+            with sqlite3.connect("finance.db") as conn:
+                cursor = conn.cursor()
+                cursor.execute(
+                    "INSERT INTO income(date, type, amount, info) VALUES(?, ?, ?, ?)",
+                    (date, t_type, amount, info),
+                )
+                conn.commit()
+
+        except sqlite3.IntegrityError:
+            return render_template(
+                "err.html",
+                message=f"Integrity Was Not Respected {date} {t_type} {amount} {info}",
+            )
+        except Exception as e:
+            return render_template("err.html", message=str(e))
+        return redirect("/income")
+    try:
+        with sqlite3.connect("finance.db") as conn:
+            cursor = conn.cursor()
+            cursor.execute("SELECT * FROM type")
+            data = cursor.fetchall()
+    except Exception as e:
+        return render_template("err.html", message=str(e))
+    return render_template("add_income.html", types=data)
 
 
 @app.route("/income/sheet/<time>")
 def income_sheet_time(time):
-    return render_template("expense_t.html")
+    data = fetch_data("income", time)
+
+    file_name = f"income_sheet_{time}.xlsx"
+    file_path = os.path.join("sheets", file_name)
+
+    if not os.path.exists("sheets"):
+        os.makedirs("sheets")
+
+    workbook = xlsxwriter.Workbook(file_path)
+    worksheet = workbook.add_worksheet("Income Sheet")
+
+    header_format = workbook.add_format(
+        {"bold": True, "bg_color": "#D7E4BC", "border": 1}
+    )
+    currency_format = workbook.add_format({"num_format": "$#,##0.00", "border": 1})
+    date_format = workbook.add_format({"num_format": "yyyy-mm-dd", "border": 1})
+    total_format = workbook.add_format(
+        {"bold": True, "bg_color": "#FFEB9C", "border": 1}
+    )
+
+    headers = ["ID", "Date", "Type", "Amount", "Info"]
+    for col_num, header in enumerate(headers):
+        worksheet.write(0, col_num, header, header_format)
+
+    for row_num, row_data in enumerate(data, start=1):
+        worksheet.write(row_num, 0, row_data[0])  # ID
+        worksheet.write(row_num, 1, row_data[1], date_format)  # Date
+        worksheet.write(row_num, 2, row_data[2])  # Type
+        worksheet.write(row_num, 3, row_data[3], currency_format)  # Amount
+        worksheet.write(row_num, 4, row_data[4])  # Info
+
+    total_row = len(data) + 1
+    worksheet.write(total_row, 2, "Total", total_format)
+    worksheet.write_formula(total_row, 3, f"=SUM(D2:D{total_row})", total_format)
+
+    worksheet.set_column(0, 0, 5)  # ID
+    worksheet.set_column(1, 1, 15)  # Date
+    worksheet.set_column(2, 2, 15)  # Type
+    worksheet.set_column(3, 3, 15)  # Amount
+    worksheet.set_column(4, 4, 30)  # Info
+
+    workbook.close()
+
+    return render_template("err.html", message="Done")
 
 
 # expense

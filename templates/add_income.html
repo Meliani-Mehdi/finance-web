@@ -19,9 +19,9 @@
       {% endfor %}
     </select>
     <label for="amount">Amount:</label>
-    <input type="text" name="Amount" pattern="^(?!0(\.0+)?$)\d+(\.\d+)?$" required title="Please enter a positive number greater than zero"> 
+    <input type="text" name="amount" pattern="^(?!0(\.0+)?$)\d+(\.\d+)?$" required title="Please enter a positive number greater than zero"> 
     <label for="comment">Comment:</label>
-    <textarea id="comment" name="comments" rows="10" cols="50"></textarea>
+    <textarea id="comment" name="comment" rows="10" cols="50"></textarea>
     <button class="apply_btn">Add</button>
   </form>
 {% endblock %}
