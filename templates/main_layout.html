@@ -19,8 +19,9 @@
       <img class="logo" src="{{ url_for('static', filename='assets/th.png') }}" onclick="goToHomePage()" style="cursor: pointer;"/>
       <ul class="nav">
         <li><a href="/">Main</a></li>
-        <li><a href="/expenses"">Expenses</a></li>
-        <li><a href="/income"">Income</a></li>
+        <li><a href="/graph">information</a></li>
+        <li><a href="/expenses">Expenses</a></li>
+        <li><a href="/income">Income</a></li>
         <li><a href="/types">Types</a></li>
       </ul>
     </div>
@@ -32,7 +33,6 @@
 
     </div>
   </body>
-  <script src="{{ url_for('static', filename = 'JS/plotly-latest.min.js') }}"></script>
   <script>
     function goToHomePage() {
       window.location.href = '/';

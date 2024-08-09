@@ -1,0 +1,131 @@
+{% extends "main_layout.html" %}
+
+{% block head %}
+  <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename = 'CSS/graph.css') }}">
+{% endblock %}
+
+{% block content %}
+    <h2>Income and Expenses Dashboard</h2>
+    
+    <!-- Time Selector Form -->
+    <form method="POST" action="/graph">
+        <div class="time-selector">
+            <label for="time-period">Select Time Period:</label>
+            <select id="time-period" name="time_period" onchange="this.form.submit()">
+                <option value="day" {% if time_period == 'day' %}selected{% endif %}>Day</option>
+                <option value="week" {% if time_period == 'week' %}selected{% endif %}>Week</option>
+                <option value="month" {% if time_period == 'month' %}selected{% endif %}>Month</option>
+                <option value="3months" {% if time_period == '3months' %}selected{% endif %}>3 Months</option>
+                <option value="year" {% if time_period == 'year' %}selected{% endif %}>Year</option>
+                <option value="all" {% if time_period == 'all' %}selected{% endif %}>All Time</option>
+            </select>
+        </div>
+    </form>
+
+    <!-- Summary Section -->
+    <div class="summary">
+        <div class="summary-item">
+            <h3>Total Income</h3>
+            <p id="total-income">${{ combinedData.totalIncome }}</p>
+        </div>
+        <div class="summary-item">
+            <h3>Total Expenses</h3>
+            <p id="total-expenses">${{ combinedData.totalExpenses }}</p>
+        </div>
+        <div class="summary-item">
+            <h3>Net Savings</h3>
+            <p id="net-savings">${{ combinedData.netSavings }}</p>
+        </div>
+        <div class="summary-item">
+            <h3>Savings Rate</h3>
+            <p id="savings-rate">{{ combinedData.savingsRate }}%</p>
+        </div>
+        <div class="summary-item">
+            <h3>Average Daily Income</h3>
+            <p id="avg-daily-income">${{ combinedData.avgDailyIncome }}</p>
+        </div>
+        <div class="summary-item">
+            <h3>Average Daily Expenses</h3>
+            <p id="avg-daily-expenses">${{ combinedData.avgDailyExpenses }}</p>
+        </div>
+    </div>
+    
+    <!-- Graphs Section -->
+    <div class="graphs">
+        <div id="income-graph" class="graph"></div>
+        <div id="expenses-graph" class="graph"></div>
+        <div id="combined-graph" class="graph"></div>
+        <div id="savings-rate-graph" class="graph"></div>
+        <div id="income-expense-trend-graph" class="graph"></div>
+        <div id="category-breakdown-graph" class="graph"></div>
+        <div id="cumulative-savings-graph" class="graph"></div>
+        <div id="highest-expense-categories-graph" class="graph"></div>
+    </div>
+    
+    <!-- Recent Transactions Section -->
+    <h3>Recent Transactions</h3>
+    <table class="transactions-table">
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>Type</th>
+                <th>Category</th>
+                <th>Amount</th>
+                <th>Info</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for transaction in transactions %}
+                <tr>
+                    <td>{{ transaction[0] }}</td>
+                    <td>{{ transaction[1] }}</td>
+                    <td>{{ transaction[2] }}</td>
+                    <td>${{ transaction[3] }}</td>
+                    <td>{{ transaction[4] }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <!-- Script to render the graphs -->
+    <script src="{{ url_for('static', filename = 'JS/plotly-latest.min.js') }}"></script>
+    <script>
+        // Data passed from Flask
+        var incomeData = {{ incomeData | tojson  }};
+        var expensesData = {{ expensesData | tojson }};
+        var combinedData = {{ combinedData | tojson }};
+        var savingsRateData = {{ savingsRateData | tojson }};
+        var incomeExpenseTrendData = {{ incomeExpenseTrendData | tojson }};
+        var categoryBreakdownData = {{ categoryBreakdownData | tojson }};
+        var cumulativeSavingsData = {{ cumulativeSavingsData | tojson }};
+        var highestExpenseCategoriesData = {{ highestExpenseCategoriesData | tojson }};
+        
+        // Function to draw graphs with animations
+        function drawGraph(graphData, graphDivId) {
+            console.log(graphData); // Log data to ensure it's correct
+            Plotly.newPlot(graphDivId, graphData.data, graphData.layout, {displayModeBar: false});
+
+            Plotly.animate(graphDivId, {
+                data: graphData.data,
+                layout: graphData.layout
+            }, {
+                transition: {
+                    duration: 500,
+                    easing: 'cubic-in-out'
+                },
+                frame: {
+                    duration: 500
+                }
+            });
+        }
+
+        drawGraph(incomeData, 'income-graph');
+        drawGraph(expensesData, 'expenses-graph');
+        drawGraph(combinedData, 'combined-graph');
+        drawGraph(savingsRateData, 'savings-rate-graph');
+        drawGraph(incomeExpenseTrendData, 'income-expense-trend-graph');
+        drawGraph(categoryBreakdownData, 'category-breakdown-graph');
+        drawGraph(cumulativeSavingsData, 'cumulative-savings-graph');
+        drawGraph(highestExpenseCategoriesData, 'highest-expense-categories-graph');
+    </script>
+{% endblock %}

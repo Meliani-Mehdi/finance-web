@@ -9,6 +9,9 @@
 {% endblock %}
 
 {% block content %}
+  <form action="/expenses/sheet/{{ time }}" method="post">
+    <button class="fade_btn">Download Expense Worksheet</button>
+  </form>
   <br><br><br>
   <table>
     <thead>
